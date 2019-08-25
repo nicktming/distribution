@@ -2,6 +2,7 @@ package filesystem
 
 import (
 	"fmt"
+	"github.com/docker/distribution/context"
 	"os"
 	"testing"
 )
@@ -23,6 +24,8 @@ func TestDriverFileWrite(t *testing.T)  {
 	defer file.Close()
 }
 
+
+// go test -v -test.run TestDriverFileWriteCommit
 func TestDriverFileWriteCommit(t *testing.T)  {
 	file, err := os.OpenFile("test1.txt", os.O_CREATE | os.O_RDWR, 0644)
 	if err != nil {
@@ -58,6 +61,42 @@ func TestDriverFileWriteCancel(t *testing.T)  {
 	fw := newFileWriter(file, 0)
 	fw.Write([]byte("test"))
 	fw.Cancel()
+}
+
+
+func TestDriverWrite(t *testing.T) {
+	// 生成一个driver
+	driver, _ := FromParameters(nil)
+	ctx := context.Background()
+	fw, _ := driver.Writer(ctx, "test.txt", true)
+	content1 := "content1"
+	fw.Write([]byte(content1))
+	c, _ := driver.GetContent(ctx, "test.txt")
+	fmt.Printf("first: Get c : %v\n", c)
+	if string(c) != content1 {
+		t.Fatalf("getcontent %v != %v\n", c, content1)
+	}
+	fw.Close()
+
+	fw, _ = driver.Writer(ctx, "test.txt", true)
+	content2 := "content2"
+	fw.Write([]byte(content2))
+	c, _ = driver.GetContent(ctx, "test.txt")
+	fmt.Printf("second: Get c : %v\n", c)
+	if string(c) != content1 + content2 {
+		t.Fatalf("getcontent %v != %v\n", c, content1)
+	}
+	fw.Close()
+
+	fw, _ = driver.Writer(ctx, "test.txt", false)
+	content3 := "content3"
+	fw.Write([]byte(content3))
+	c, _ = driver.GetContent(ctx, "test.txt")
+	fmt.Printf("third: Get c : %v\n", c)
+	if string(c) != content1 + content2 {
+		t.Fatalf("getcontent %v != %v\n", c, content1)
+	}
+	fw.Close()
 }
 
 

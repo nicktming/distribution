@@ -148,6 +148,7 @@ func (d *driver) PutContent(ctx context.Context, subPath string, contents []byte
 
 // Reader retrieves an io.ReadCloser for the content stored at "path" with a
 // given byte offset.
+// 返回一个从offset开始读的ReadCloser 这里用的是最简单的file
 func (d *driver) Reader(ctx context.Context, path string, offset int64) (io.ReadCloser, error) {
 	file, err := os.OpenFile(d.fullPath(path), os.O_RDONLY, 0644)
 	if err != nil {
@@ -171,6 +172,9 @@ func (d *driver) Reader(ctx context.Context, path string, offset int64) (io.Read
 	return file, nil
 }
 
+// append 表示是否从文件末尾追加
+// append 为false的时候 则从头开始写 (无论原先的文件中是否有内容)
+// append 为true的时候 则从末尾添加
 func (d *driver) Writer(ctx context.Context, subPath string, append bool) (storagedriver.FileWriter, error) {
 	fullPath := d.fullPath(subPath)
 	parentDir := path.Dir(fullPath)
