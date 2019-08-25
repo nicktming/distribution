@@ -337,7 +337,7 @@ func (fi fileInfo) IsDir() bool {
 
 type fileWriter struct {
 	file      *os.File
-	size      int64 // 当前往file里面写入的byte个数
+	size      int64 // 当前往file里面写入的byte个数 包括在缓存里面的
 	bw        *bufio.Writer
 	closed    bool  //此file是否已经关闭
 	committed bool  //此file是否已经commit
@@ -348,7 +348,7 @@ func newFileWriter(file *os.File, size int64) *fileWriter {
 	return &fileWriter{
 		file: file,
 		size: size,
-		bw:   bufio.NewWriter(file),
+		bw:   bufio.NewWriter(file), // 默认缓存大小为4096
 	}
 }
 
@@ -360,6 +360,7 @@ func (fw *fileWriter) Write(p []byte) (int, error) {
 	} else if fw.cancelled {
 		return 0, fmt.Errorf("already cancelled")
 	}
+	// 当缓存区中的内容满后, 会刷4096(缓存区大小) bytes到文件中
 	n, err := fw.bw.Write(p)
 	fw.size += int64(n)
 	return n, err
@@ -389,6 +390,7 @@ func (fw *fileWriter) Close() error {
 	return nil
 }
 
+// 会把对应文件删除
 func (fw *fileWriter) Cancel() error {
 	if fw.closed {
 		return fmt.Errorf("already closed")
@@ -399,6 +401,8 @@ func (fw *fileWriter) Cancel() error {
 	return os.Remove(fw.file.Name())
 }
 
+// 将缓存区中的内容刷到文件中
+// 只能commit一次, fw.commmitted会被设置为true, 第二次会报already committed
 func (fw *fileWriter) Commit() error {
 	if fw.closed {
 		return fmt.Errorf("already closed")
