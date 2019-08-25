@@ -67,33 +67,35 @@ func TestDriverFileWriteCancel(t *testing.T)  {
 
 func TestDriverWrite(t *testing.T) {
 	// 生成一个driver
+	path := "/test.txt"
+
 	driver, err := FromParameters(nil)
 	fmt.Printf("driver:%v, err:%v\n", driver, err)
 	ctx := context.Background()
-	fw, _ := driver.Writer(ctx, "test.txt", true)
+	fw, _ := driver.Writer(ctx, path, true)
 	content1 := "content1"
 	fw.Write([]byte(content1))
-	c, _ := driver.GetContent(ctx, "test.txt")
+	c, _ := driver.GetContent(ctx, path)
 	fmt.Printf("first: Get c : %v\n", c)
 	if string(c) != content1 {
 		t.Fatalf("getcontent %v != %v\n", c, content1)
 	}
 	fw.Close()
 
-	fw, _ = driver.Writer(ctx, "test.txt", true)
+	fw, _ = driver.Writer(ctx, path, true)
 	content2 := "content2"
 	fw.Write([]byte(content2))
-	c, _ = driver.GetContent(ctx, "test.txt")
+	c, _ = driver.GetContent(ctx, path)
 	fmt.Printf("second: Get c : %v\n", c)
 	if string(c) != content1 + content2 {
 		t.Fatalf("getcontent %v != %v\n", c, content1)
 	}
 	fw.Close()
 
-	fw, _ = driver.Writer(ctx, "test.txt", false)
+	fw, _ = driver.Writer(ctx, path, false)
 	content3 := "content3"
 	fw.Write([]byte(content3))
-	c, _ = driver.GetContent(ctx, "test.txt")
+	c, _ = driver.GetContent(ctx, path)
 	fmt.Printf("third: Get c : %v\n", c)
 	if string(c) != content1 + content2 {
 		t.Fatalf("getcontent %v != %v\n", c, content1)
