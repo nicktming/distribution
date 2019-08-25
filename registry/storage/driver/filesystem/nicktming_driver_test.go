@@ -77,7 +77,7 @@ func TestDriverWrite(t *testing.T) {
 	fw.Write([]byte(content1))
 	fw.Commit()
 	c, _ := driver.GetContent(ctx, path)
-	fmt.Printf("first: Get c : %v\n", c)
+	fmt.Printf("first: Get c : %v\n", string(c))
 	if string(c) != content1 {
 		t.Fatalf("getcontent %v != %v\n", c, content1)
 	}
@@ -88,9 +88,9 @@ func TestDriverWrite(t *testing.T) {
 	fw.Write([]byte(content2))
 	fw.Commit()
 	c, _ = driver.GetContent(ctx, path)
-	fmt.Printf("second: Get c : %v\n", c)
+	fmt.Printf("second: Get c : %v\n", string(c))
 	if string(c) != content1 + content2 {
-		t.Fatalf("getcontent %v != %v\n", c, content1)
+		t.Fatalf("getcontent %v != %v\n", c, content1 + content2)
 	}
 	fw.Close()
 
@@ -99,9 +99,9 @@ func TestDriverWrite(t *testing.T) {
 	fw.Write([]byte(content3))
 	fw.Commit()
 	c, _ = driver.GetContent(ctx, path)
-	fmt.Printf("third: Get c : %v\n", c)
-	if string(c) != content1 + content2 {
-		t.Fatalf("getcontent %v != %v\n", c, content1)
+	fmt.Printf("third: Get c : %v\n", string(c))
+	if string(c) != content3 {
+		t.Fatalf("getcontent %v != %v\n", c, content3)
 	}
 	fw.Close()
 }
