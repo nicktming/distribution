@@ -158,6 +158,7 @@ func (d *driver) Reader(ctx context.Context, path string, offset int64) (io.Read
 		return nil, err
 	}
 
+	// 从文件开始offset
 	seekPos, err := file.Seek(offset, io.SeekStart)
 	if err != nil {
 		file.Close()
@@ -336,11 +337,11 @@ func (fi fileInfo) IsDir() bool {
 
 type fileWriter struct {
 	file      *os.File
-	size      int64
+	size      int64 // 当前往file里面写入的byte个数
 	bw        *bufio.Writer
-	closed    bool
-	committed bool
-	cancelled bool
+	closed    bool  //此file是否已经关闭
+	committed bool  //此file是否已经commit
+	cancelled bool  //此file是否已经cancel
 }
 
 func newFileWriter(file *os.File, size int64) *fileWriter {
