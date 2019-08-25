@@ -63,10 +63,12 @@ func TestDriverFileWriteCancel(t *testing.T)  {
 	fw.Cancel()
 }
 
+// go test -v -test.run TestDriverWrite
 
 func TestDriverWrite(t *testing.T) {
 	// 生成一个driver
-	driver, _ := FromParameters(nil)
+	driver, err := FromParameters(nil)
+	fmt.Printf("driver:%v, err:%v\n", driver, err)
 	ctx := context.Background()
 	fw, _ := driver.Writer(ctx, "test.txt", true)
 	content1 := "content1"
