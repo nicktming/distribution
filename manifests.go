@@ -48,18 +48,23 @@ type ManifestBuilder interface {
 }
 
 // ManifestService describes operations on image manifests.
+// ManifestService定义了一些manifest操作
 type ManifestService interface {
 	// Exists returns true if the manifest exists.
+	// 检查是否存在该digest
 	Exists(ctx context.Context, dgst digest.Digest) (bool, error)
 
 	// Get retrieves the manifest specified by the given digest
+	// 根据dgst获得Manifest
 	Get(ctx context.Context, dgst digest.Digest, options ...ManifestServiceOption) (Manifest, error)
 
 	// Put creates or updates the given manifest returning the manifest digest
+	// 将Manifest存入到文件中
 	Put(ctx context.Context, manifest Manifest, options ...ManifestServiceOption) (digest.Digest, error)
 
 	// Delete removes the manifest specified by the given digest. Deleting
 	// a manifest that doesn't exist will return ErrManifestNotFound
+	// 根据dgst删除manifest
 	Delete(ctx context.Context, dgst digest.Digest) error
 }
 

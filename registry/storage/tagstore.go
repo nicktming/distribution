@@ -9,6 +9,7 @@ import (
 	"github.com/opencontainers/go-digest"
 )
 
+// 在build的时候如果tagStore没有实现distribution.TagService接口所有的方法会保错
 var _ distribution.TagService = &tagStore{}
 
 // tagStore provides methods to manage manifest tags in a backend storage driver.
